@@ -1,0 +1,14 @@
+{
+  "best_val_acc": 0.9976744186046511,
+  "test_loss": 0.03526842940066542,
+  "test_acc": 0.9953703703703703,
+  "test_precision": 0.9957561728395062,
+  "test_recall": 0.9953703703703703,
+  "test_f1": 0.9954597227131692,
+  "epochs": 10,
+  "class_names": [
+    "Potato___Early_blight",
+    "Potato___Late_blight",
+    "Potato___healthy"
+  ]
+}

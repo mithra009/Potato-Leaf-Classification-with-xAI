@@ -5,7 +5,6 @@ __pycache__/
 .vscode/
 
 # Large or generated artifacts
-outputs/
 reports/
 models/
 data/PlantVillage/
@@ -14,7 +13,6 @@ data/PlantVillage/
 *.onnx
 
 # Keep empty directories in the repo if needed
-!outputs/.gitkeep
 !reports/.gitkeep
 !models/.gitkeep
 !data/.gitkeep

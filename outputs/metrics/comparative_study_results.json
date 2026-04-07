@@ -1,0 +1,46 @@
+{
+    "ViT": {
+        "parameters": 85800963,
+        "learning_rate": 5e-05,
+        "batch_size": 16,
+        "training_time": 579.1647109985352,
+        "epochs": 15,
+        "test_accuracy": 1.0,
+        "test_precision": 1.0,
+        "test_recall": 1.0,
+        "test_f1": 1.0
+    },
+    "ResNet50": {
+        "parameters": 23514179,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "training_time": 193.62786746025085,
+        "epochs": 15,
+        "test_accuracy": 0.9907407407407407,
+        "test_precision": 0.9909979423868313,
+        "test_recall": 0.9907407407407407,
+        "test_f1": 0.9907928491261825
+    },
+    "VGG16": {
+        "parameters": 134272835,
+        "learning_rate": 0.0001,
+        "batch_size": 32,
+        "training_time": 9367.099032402039,
+        "epochs": 15,
+        "test_accuracy": 1.0,
+        "test_precision": 1.0,
+        "test_recall": 1.0,
+        "test_f1": 1.0
+    },
+    "MobileNetV2": {
+        "parameters": 2227715,
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "training_time": 229.1654224395752,
+        "epochs": 15,
+        "test_accuracy": 0.9907407407407407,
+        "test_precision": 0.9908976773383552,
+        "test_recall": 0.9907407407407407,
+        "test_f1": 0.9907238513268324
+    }
+}

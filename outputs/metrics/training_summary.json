@@ -1,0 +1,30 @@
+{
+    "hyperparameters": {
+        "batch_size": 32,
+        "learning_rate": 5e-05,
+        "weight_decay": 0.01,
+        "epochs": 5,
+        "warmup_steps": 100,
+        "image_size": 224,
+        "vit_model": "google/vit-base-patch16-224"
+    },
+    "dataset": {
+        "total_samples": 2152,
+        "train_samples": 1506,
+        "val_samples": 430,
+        "test_samples": 216,
+        "classes": [
+            "Potato___Early_blight",
+            "Potato___Late_blight",
+            "Potato___healthy"
+        ]
+    },
+    "results": {
+        "best_val_accuracy": 1.0,
+        "test_accuracy": 1.0,
+        "test_precision": 1.0,
+        "test_recall": 1.0,
+        "test_f1_score": 1.0
+    },
+    "training_time_minutes": 3.8110561927159625
+}
