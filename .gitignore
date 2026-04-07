@@ -1,0 +1,21 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+
+# Large or generated artifacts
+outputs/
+reports/
+models/
+data/PlantVillage/
+*.pth
+*.pt
+*.onnx
+
+# Keep empty directories in the repo if needed
+!outputs/.gitkeep
+!reports/.gitkeep
+!models/.gitkeep
+!data/.gitkeep
+!data/*.pdf
