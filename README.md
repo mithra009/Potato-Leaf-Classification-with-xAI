@@ -238,6 +238,108 @@ The evaluation scripts report:
 - ROC-AUC
 - Per-class metric breakdown
 
+## Results Summary
+
+### ViT Training Summary
+
+`outputs/metrics/training_summary.json`
+
+| Metric | Value |
+| --- | ---: |
+| Total samples | 2,152 |
+| Train samples | 1,506 |
+| Validation samples | 430 |
+| Test samples | 216 |
+| Classes | 3 |
+| Backbone | `google/vit-base-patch16-224` |
+| Batch size | 32 |
+| Learning rate | `5e-5` |
+| Weight decay | `0.01` |
+| Epochs | 5 |
+| Warmup steps | 100 |
+| Image size | 224 |
+| Best validation accuracy | 1.0 |
+| Test accuracy | 1.0 |
+| Test precision | 1.0 |
+| Test recall | 1.0 |
+| Test F1-score | 1.0 |
+| Training time | 3.81 minutes |
+
+### ViT Evaluation Report
+
+`outputs/metrics/evaluation_report.json`
+
+| Metric | Value |
+| --- | ---: |
+| Accuracy | 1.0 |
+| Precision macro | 1.0 |
+| Recall macro | 1.0 |
+| F1 macro | 1.0 |
+| Precision weighted | 1.0 |
+| Recall weighted | 1.0 |
+| F1 weighted | 1.0 |
+
+Per-class metrics:
+
+| Class | Precision | Recall | F1-score |
+| --- | ---: | ---: | ---: |
+| Potato___Early_blight | 1.0 | 1.0 | 1.0 |
+| Potato___Late_blight | 1.0 | 1.0 | 1.0 |
+| Potato___healthy | 1.0 | 1.0 | 1.0 |
+
+Confusion matrix:
+
+| Actual \ Predicted | Early blight | Late blight | Healthy |
+| --- | ---: | ---: | ---: |
+| Early blight | 1000 | 0 | 0 |
+| Late blight | 0 | 1000 | 0 |
+| Healthy | 0 | 0 | 152 |
+
+### ResNet50 Training Summary
+
+`outputs/metrics/resnet_training_summary.json`
+
+| Metric | Value |
+| --- | ---: |
+| Best validation accuracy | 0.9976744186 |
+| Test loss | 0.0352684294 |
+| Test accuracy | 0.9953703704 |
+| Test precision | 0.9957561728 |
+| Test recall | 0.9953703704 |
+| Test F1-score | 0.9954597227 |
+| Epochs | 10 |
+
+### Comparative Study
+
+`outputs/metrics/comparative_study_results.json`
+
+| Model | Parameters | Learning rate | Batch size | Epochs | Training time (s) | Test accuracy | Test precision | Test recall | Test F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| ViT | 85,800,963 | `5e-5` | 16 | 15 | 579.16 | 1.0 | 1.0 | 1.0 | 1.0 |
+| ResNet50 | 23,514,179 | `0.001` | 32 | 15 | 193.63 | 0.9907407407 | 0.9909979424 | 0.9907407407 | 0.9907928491 |
+| VGG16 | 134,272,835 | `0.0001` | 32 | 15 | 9367.10 | 1.0 | 1.0 | 1.0 | 1.0 |
+| MobileNetV2 | 2,227,715 | `0.001` | 32 | 15 | 229.17 | 0.9907407407 | 0.9908976773 | 0.9907407407 | 0.9907238513 |
+
+### Result Artifacts
+
+Key result files generated in the repository:
+- `outputs/plots/training_history.png`
+- `outputs/plots/confusion_matrix_validation.png`
+- `outputs/plots/confusion_matrix_test.png`
+- `outputs/plots/confusion_matrix_eval.png`
+- `outputs/plots/roc_curves.png`
+- `outputs/plots/metrics_comparison.png`
+- `outputs/comparison/model_comparison.png`
+- `outputs/comparison/training_time_comparison.png`
+- `outputs/inference/inference_results.png`
+- `outputs/robustness/robustness_results.png`
+- `outputs/robustness/robustness_heatmap.png`
+- `outputs/xai/vit/xai_example.png`
+- `outputs/xai/resnet/xai_resnet_summary.png`
+- `outputs/xai/resnet/xai_Potato___Early_blight.png`
+- `outputs/xai/resnet/xai_Potato___Late_blight.png`
+- `outputs/xai/resnet/xai_Potato___healthy.png`
+
 ## GitHub Guidance
 
 When pushing to GitHub, keep these rules in mind:
@@ -245,6 +347,7 @@ When pushing to GitHub, keep these rules in mind:
 - Do not commit the raw dataset if the repository should stay lightweight
 - Keep `data/ViT_XAI_Potato_Assignment-G2.pdf` if you want the assignment document tracked in the repo
 - Generated files are already grouped under `outputs/`
+- Large trained weight files are stored locally in `models/` in this checkout; if you want them versioned on GitHub, use Git LFS or another artifact store because GitHub rejects files larger than 100 MB.
 
 ## Troubleshooting
 
