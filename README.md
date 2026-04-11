@@ -373,6 +373,14 @@ Run commands from the repository root, not from inside `scripts/`.
 - Installation instructions in this README
 - Dependency list in `requirements.txt`
 
+## Group Members
+
+- ARKO BERA (BT23CSD001)
+- VISHAL SINGH (BT23CSD002)
+- TANISHQ PARIHAR (BT23CSD005)
+- MITHRA (BT23CSD025)
+- UTKARSH GAUR (BT23CSD055)
+
 ## License
 
 Educational project for computer vision and deep learning coursework.
