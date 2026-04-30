@@ -252,6 +252,16 @@ Class distribution:
 - Optimizer: AdamW
 - Fine-tuning strategy: ViT backbone frozen for the first 2 epochs, then unfrozen from epoch 3 onward
 
+### Vision Transformer - (3 Fold Cross Validation)
+- Backbone: google/vit-base-patch16-224
+- Folds: 3
+- Epochs per fold: 7
+- Batch size: 32
+- Learning rate: 5e-5
+- Optimizer: AdamW
+- Loss: CrossEntropyLoss
+- Image size: 224 × 224
+
 ### Comparative Study Models
 - ViT: reused from the trained ViT run
 - ResNet50: trained for up to `4` epochs
@@ -353,6 +363,16 @@ ViT epoch history from the notebook:
 | 5 | 0.9914 | 0.9976 |
 
 The ViT result is very strong on the validation split, but the final test result reported by the notebook is based on the ResNet50 3-fold ensemble, not the ViT alone.
+
+### ViT CV Results
+| Fold     | Final Train Accuracy | Best Validation Accuracy |
+| -------- | -------------------- | ------------------------ |
+| 1        | 0.9763               | 0.9730                   |
+| 2        | 0.9771               | 0.9664                   |
+| 3        | 0.9783               | 0.9787                   |
+| **Mean** | **0.9772**           | **0.9665**               |
+
+
 
 ### Comparative Validation Study
 
