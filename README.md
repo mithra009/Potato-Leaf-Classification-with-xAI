@@ -157,6 +157,8 @@ Late Blight samples capture irregular dark regions and spread patterns, demonstr
 Generated Samples after 500 epochs
 <img width="530" height="200" alt="epoch_final_all_classes" src="https://github.com/user-attachments/assets/17729489-7409-45d8-b332-4dc543394132" />
 
+FID score - 44
+
 
 ## Observations
 
