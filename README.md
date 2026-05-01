@@ -123,14 +123,14 @@ The label embedding is spatially expanded and concatenated with the image channe
 
 ---
 
-### Generated Samples
+### Generated Samples (after 200 epochs)
 
 The trained GAN generates synthetic potato leaf images for each class. Below are representative samples produced by the generator.
 
 ### Early Blight (Synthetic)
-<img width="256" height="256" alt="PLD_3_Classes_256__Testing__Early_Blight__Early_Blight_145__gaussian_noise_3" src="https://github.com/user-attachments/assets/df7bdc37-6a72-41ad-80e9-caacda81cae4" />
-<img width="256" height="256" alt="PLD_3_Classes_256__Training__Early_Blight__Early_Blight_1058__gaussian_noise_2" src="https://github.com/user-attachments/assets/b59b7c02-24ff-4d7c-a7c8-4135e02efadf" />
-<img width="256" height="256" alt="PLD_3_Classes_256__Training__Early_Blight__Early_Blight_859__gaussian_noise_1" src="https://github.com/user-attachments/assets/852bd3c6-8a29-4239-83e8-783154d1a69b" />
+
+<img width="530" height="68" alt="epoch_20_Early_Blight (1)" src="https://github.com/user-attachments/assets/6460c8f9-724c-4e5e-8dd5-0785f5d4229a" />
+
 
 
 The generated Early Blight samples show characteristic lesion-like patterns and texture variations, indicating that the model has learned disease-specific visual cues.
@@ -138,9 +138,8 @@ The generated Early Blight samples show characteristic lesion-like patterns and 
 ---
 
 ### Healthy Leaves (Synthetic)
-<img width="256" height="256" alt="PLD_3_Classes_256__Testing__Healthy__Healthy_12__gaussian_noise_3" src="https://github.com/user-attachments/assets/10a8bd8f-6c43-46f7-9f68-b8b2c68121c8" />
-<img width="256" height="256" alt="PLD_3_Classes_256__Training__Healthy__Healthy_447__gaussian_noise_1" src="https://github.com/user-attachments/assets/ae7a2ada-8bd0-4fbe-b8f9-63037932fc47" />
-<img width="256" height="256" alt="PLD_3_Classes_256__Training__Healthy__Healthy_806__gaussian_noise_2" src="https://github.com/user-attachments/assets/f2d39ac2-0381-4026-bb2c-6198dbe0dd40" />
+<img width="530" height="68" alt="epoch_20_Healthy" src="https://github.com/user-attachments/assets/1586a9b3-8f7c-4464-8576-7974e61ec4be" />
+
 
 
 Healthy class samples exhibit smooth texture and uniform coloration, closely resembling real healthy leaves without disease artifacts.
@@ -148,13 +147,16 @@ Healthy class samples exhibit smooth texture and uniform coloration, closely res
 ---
 
 ### Late Blight (Synthetic)
-<img width="256" height="256" alt="PLD_3_Classes_256__Training__Late_Blight__Late_Blight_149__gaussian_noise_3" src="https://github.com/user-attachments/assets/827b1597-5618-4e1f-8941-2c0e316e0f3d" />
-<img width="256" height="256" alt="PLD_3_Classes_256__Training__Late_Blight__Late_Blight_19__gaussian_noise_1" src="https://github.com/user-attachments/assets/6de7b77e-44c2-41d9-a2a6-4095b1e94ae7" />
-<img width="256" height="256" alt="PLD_3_Classes_256__Training__Late_Blight__Late_Blight_231__gaussian_noise_2" src="https://github.com/user-attachments/assets/2c0145b5-c208-4fb8-9bd3-50011eac4f35" />
+<img width="530" height="68" alt="epoch_20_Late_Blight" src="https://github.com/user-attachments/assets/dc817343-7acf-4ac5-8917-cee48cbe419e" />
+
 
 Late Blight samples capture irregular dark regions and spread patterns, demonstrating that the GAN can approximate complex disease structures.
 
 ---
+
+Generated Samples after 500 epochs
+<img width="530" height="200" alt="epoch_final_all_classes" src="https://github.com/user-attachments/assets/17729489-7409-45d8-b332-4dc543394132" />
+
 
 ## Observations
 
