@@ -10,432 +10,196 @@ The latest notebook classifies three PLD dataset classes:
 - `Late_Blight`
 
 It includes:
-- ResNet50 3-fold cross-validation with overfitting control
-- ViT training and evaluation for transformer comparison
-- ResNet50 and VGG16 comparative training
+- ResNet50 and VIT 3-fold cross-validation with overfitting control
 - Grad-CAM and attention-based visualizations
 - Robustness testing under synthetic perturbations
-- Final test evaluation, confusion matrix, ROC curves, and inference visualization
 
-## Repository Layout
+---
 
-```text
+# Methodology
 
-├── data/
-│   ├── PlantVillage/                 # Dataset root used by the scripts
-│   └── ViT_XAI_Potato_Assignment-G2.pdf
-├── outputs/
-│   ├── checkpoints/                  # Trained model checkpoints
-│   ├── plots/                        # Training curves, confusion matrices, ROC curves
-│   ├── metrics/                      # JSON reports and summaries
-│   ├── xai/                          # Explainability images
-│   │   ├── vit/
-│   │   └── resnet/
-│   ├── robustness/                   # Robustness plots
-│   ├── comparison/                   # Comparative study plots
-│   └── inference/                   # Inference result images
-├── scripts/
-│   ├── train_gpu.py                  # ViT training script
-│   ├── evaluate_model.py             # ViT evaluation script
-│   ├── inference.py                  # ViT inference script
-│   ├── xai_explainability.py         # ViT explainability script
-│   ├── robustness_test.py            # ViT robustness testing
-│   ├── comparative_study.py          # ViT vs CNN comparison
-│   ├── train_resnet.py               # ResNet50 training script
-│   ├── xai_resnet.py                 # ResNet50 explainability script
-│   └── project_paths.py              # Shared root/path resolver
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
+## Dataset and Experimental Setup
 
-## Directory Rules
+The model is trained and evaluated on the PlantVillage potato leaf disease dataset consisting of three classes: Early_Blight, Healthy, and Late_Blight. The dataset contains 4,072 images, split into training (3,251), validation (416), and testing (405). A combined pool of 3,667 images from training and validation is used for cross-validation.
 
-The code now assumes the repository root is `potato_leaf/`, and the scripts resolve paths from there.
+All images are resized to 224 × 224. Training data undergoes augmentation including random resized crops, horizontal/vertical flips, rotations, affine transformations, color jitter, and random erasing. Evaluation uses deterministic resizing and center cropping. Normalization follows ImageNet statistics.
 
-### Dataset lookup order
-The scripts look for the dataset in this order:
-1. `data/PlantVillage/`
-2. `PlantVillage/` at the repository root as a fallback
+Training is performed on CUDA-enabled GPUs with DataParallel support.
 
-### Output structure
-All generated artifacts are grouped under `outputs/`:
-- `outputs/checkpoints/` for `.pth` checkpoints
-- `outputs/plots/` for training plots, confusion matrices, ROC curves
-- `outputs/metrics/` for JSON reports and summaries
-- `outputs/xai/vit/` for ViT explainability images
-- `outputs/xai/resnet/` for ResNet explainability images
-- `outputs/robustness/` for robustness plots
-- `outputs/comparison/` for comparative study plots
-- `outputs/inference/` for inference visualizations
+## Model Architectures
 
-## Installation
+### ResNet50 (Primary Model)
 
-### 1. Create a virtual environment
+A ResNet50 backbone is used as the primary CNN model. The training strategy includes:
 
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
+* 3-fold cross-validation
+* Backbone freezing for initial epochs followed by fine-tuning
+* AdamW optimizer
+* Learning rate: 1e-4
+* Weight decay: 1e-4
+* Dropout: 0.30
+* Label smoothing: 0.05
+* Gradient clipping (max norm 1.0)
+* ReduceLROnPlateau scheduler
+* Early stopping (patience = 2)
 
-### 2. Install dependencies
+Final predictions are generated using a soft-voting ensemble of the three folds.
 
-```powershell
-pip install -r requirements.txt
-```
+### Vision Transformer (ViT)
 
-### 3. Verify GPU support
+A transformer-based model (google/vit-base-patch16-224) is trained for comparison:
 
-```powershell
-python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU only')"
-```
-
-## How to Run
-
-Run the scripts from the repository root.
-
-### Train Vision Transformer
-
-```powershell
-python scripts/train_gpu.py
-```
-
-Outputs:
-- `outputs/checkpoints/best_vit_potato_model.pth`
-- `outputs/plots/training_history.png`
-- `outputs/plots/confusion_matrix_validation.png`
-- `outputs/plots/confusion_matrix_test.png`
-- `outputs/metrics/training_summary.json`
-
-### Evaluate Vision Transformer
-
-```powershell
-python scripts/evaluate_model.py
-```
-
-Outputs:
-- `outputs/metrics/evaluation_report.json`
-- `outputs/plots/confusion_matrix_eval.png`
-- `outputs/plots/metrics_comparison.png`
-- `outputs/plots/roc_curves.png`
-
-### Run ViT Explainability
-
-```powershell
-python scripts/xai_explainability.py
-```
-
-Outputs:
-- `outputs/xai/vit/xai_example.png`
-- `outputs/xai/vit/` batch visualizations if directory evaluation is used
-
-### Run ViT Inference
-
-```powershell
-python scripts/inference.py
-```
-
-Outputs:
-- `outputs/inference/inference_results.png`
-
-### Train ResNet50 Baseline
-
-```powershell
-python scripts/train_resnet.py
-```
-
-Outputs:
-- `outputs/checkpoints/best_resnet_potato_model.pth`
-- `outputs/metrics/resnet_training_summary.json`
-
-### Run ResNet Explainability
-
-```powershell
-python scripts/xai_resnet.py
-```
-
-Outputs:
-- `outputs/xai/resnet/` class-wise explainability images
-- `outputs/xai/resnet/xai_resnet_summary.png`
-
-### Comparative Study
-
-```powershell
-python scripts/comparative_study.py
-```
-
-Compares:
-- Vision Transformer
-- ResNet50
-- VGG16
-- MobileNetV2
-
-Outputs:
-- `outputs/comparison/model_comparison.png`
-- `outputs/comparison/training_time_comparison.png`
-- `outputs/metrics/comparative_study_results.json`
-
-### Robustness Testing
-
-```powershell
-python scripts/robustness_test.py
-```
-
-Tests the trained ViT under:
-- Gaussian noise
-- Salt and pepper noise
-- Gaussian blur
-- Motion blur
-- Brightness changes
-- Contrast changes
-- JPEG compression
-
-Outputs:
-- `outputs/robustness/robustness_results.png`
-- `outputs/robustness/robustness_heatmap.png`
-
-## Training Configuration
-
-### Dataset and Runtime
-- Dataset root used in the notebook: `/kaggle/input/datasets/rizwan123456789/potato-disease-leaf-datasetpld/PLD_3_Classes_256`
-- Classes: `Early_Blight`, `Healthy`, `Late_Blight`
-- Training images: `3,251`
-- Validation images: `416`
-- Testing images: `405`
-- Total images: `4,072`
-- Cross-validation pool: `3,667` images from Training + Validation
-- Runtime device: CUDA with 2 Tesla T4 GPUs using `DataParallel` where applicable
-
-Class distribution:
-
-| Split | Early_Blight | Healthy | Late_Blight | Total |
-| --- | ---: | ---: | ---: | ---: |
-| Training | 1,303 | 816 | 1,132 | 3,251 |
-| Validation | 163 | 102 | 151 | 416 |
-| Testing | 162 | 102 | 141 | 405 |
-| Total | 1,628 | 1,020 | 1,424 | 4,072 |
-
-### Shared Image Preprocessing
-- Image size: `224 x 224`
-- Training resize/crop: resize to `256 x 256`, then `RandomResizedCrop(224)`
-- Training augmentation: horizontal flip, light vertical flip, rotation, affine translation/shear, color jitter, and random erasing
-- Evaluation preprocessing: resize to `256 x 256`, center crop to `224 x 224`
-- Normalization: ImageNet mean and standard deviation
-
-### ResNet50 3-Fold Cross-Validation
-- Backbone: `torchvision.models.resnet50`
-- Purpose: main overfitting-controlled pipeline
-- Folds: `3`
-- Epochs per fold: up to `8`
-- Early stopping patience: `2`
-- Batch size: `16`
-- Learning rate: `1e-4`
-- Weight decay: `1e-4`
-- Dropout: `0.30`
-- Label smoothing: `0.05`
-- Optimizer: AdamW
-- Scheduler: ReduceLROnPlateau
-- Gradient clipping: max norm `1.0`
-- Fine-tuning strategy: CNN backbone frozen for the first 2 epochs, then unfrozen with a lower fine-tuning learning rate
-- Final test model: soft-voting probability ensemble of the three ResNet50 fold models
-
-### Vision Transformer
-- Backbone: `google/vit-base-patch16-224`
-- Epochs: up to `5`
-- Early stopping patience: `2`
-- Batch size: `8`
-- Learning rate: `3e-5`
-- Weight decay: `0.05`
-- Label smoothing: `0.10`
-- Hidden dropout: `0.20`
-- Attention dropout: `0.20`
-- Optimizer: AdamW
-- Fine-tuning strategy: ViT backbone frozen for the first 2 epochs, then unfrozen from epoch 3 onward
-
-### Vision Transformer - (3 Fold Cross Validation)
-- Backbone: google/vit-base-patch16-224
-- Folds: 3
-- Epochs per fold: 7
-- Batch size: 32
-- Learning rate: 5e-5
-- Optimizer: AdamW
-- Loss: CrossEntropyLoss
-- Image size: 224 × 224
-
-### Comparative Study Models
-- ViT: reused from the trained ViT run
-- ResNet50: trained for up to `4` epochs
-- VGG16: trained for up to `4` epochs
-- CNN comparison settings use the same augmentation, ImageNet normalization, AdamW optimizer, label smoothing, dropout, early stopping, and freeze-then-unfreeze fine-tuning pattern as the main ResNet50 pipeline
+* 3-fold cross-validation
+* Batch size: 8
+* Learning rate: 3e-5
+* Weight decay: 0.05
+* Label smoothing: 0.10
+* Dropout: 0.20
+* Backbone freezing for initial epochs followed by full fine-tuning
 
 ## Explainability Methods
 
-### ViT
-The notebook generates attention-style visualizations from the ViT attention tensors:
-- one representative test image per class
-- original image
-- attention map
-- attention overlay on the input image
+Two explainability approaches are implemented:
 
-The exported figure used by this README is:
-- `newplots/vit_attention_summary.png`
+* Grad-CAM for CNN models (ResNet50)
+* Attention visualization for Vision Transformer
 
-### ResNet
-The notebook generates Grad-CAM visualizations for the CNN model:
-- one representative test image per class
-- original image
-- Grad-CAM heatmap
-- Grad-CAM overlay with predicted class
+Each method visualizes class-specific focus regions on sample test images.
 
-The exported figure used by this README is:
-- `newplots/gradcam_resnet50_summary.png`
+## Robustness Testing
 
-## Evaluation Metrics
+Model robustness is evaluated under synthetic perturbations:
 
-The notebook reports:
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- Confusion matrix
-- ROC curves
-- ROC-AUC
-- Per-class metric breakdown
-- Robustness accuracy and F1-score under synthetic perturbations
+* Gaussian noise
+* Salt-and-pepper noise
+* Gaussian blur
+* Brightness and contrast variations
 
-## Results Summary
+Performance is measured using accuracy and F1-score on a balanced subset of 30 images.
 
-All values below are taken from `potato-se-motapa-badta-hai.ipynb` and the exported figures in `newplots/`. No values from the old `outputs/` directory are used here.
+---
 
-### Dataset Summary
+## GAN Generated Images
 
-| Metric | Value |
-| --- | ---: |
-| Total images | 4,072 |
-| Training images | 3,251 |
-| Validation images | 416 |
-| Testing images | 405 |
-| CV images | 3,667 |
-| Classes | 3 |
-| CUDA devices | 2 |
-| DataParallel | Enabled |
+## Conditional GAN Architecture
 
-### 3-Fold ResNet50 Cross-Validation
+To augment the dataset and analyze class-specific feature generation, a **conditional Deep Convolutional GAN (cGAN)** was implemented. The model conditions both the generator and discriminator on class labels (Early_Blight, Healthy, Late_Blight).
 
-The strongest and most reliable result in the new notebook is the ResNet50 3-fold cross-validation pipeline. Each fold uses the Training + Validation pool and applies augmentation, label smoothing, dropout, gradient clipping, early stopping, and staged fine-tuning.
+### Generator
 
-![3-Fold CV Training History](newplots/training_history.png)
+* Input: Noise vector (dimension = 100) + class embedding (dimension = 50)
+* Architecture: Series of transposed convolution layers (DCGAN-style)
+* Activations: ReLU (hidden), Tanh (output)
+* Output: 64 × 64 RGB image
 
-| Fold | Best epoch | Validation loss | Validation accuracy | Validation precision | Validation recall | Validation F1 | Training time |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 7 | 0.200181 | 0.991006 | 0.991160 | 0.991006 | 0.990986 | 11.783 min |
-| 2 | 6 | 0.206639 | 0.992635 | 0.992727 | 0.992635 | 0.992630 | 11.789 min |
-| 3 | 8 | 0.188067 | 0.995090 | 0.995154 | 0.995090 | 0.995098 | 11.649 min |
-| Mean | - | 0.198296 | 0.992910 | 0.993014 | 0.992910 | 0.992905 | 11.740 min |
+The class embedding is concatenated with the noise vector, allowing the generator to produce class-specific images.
 
-Key observations:
-- Validation accuracy increased sharply after the CNN backbone was unfrozen.
-- All three folds reached at least `0.9910` validation accuracy.
-- Fold 3 achieved the best validation F1-score: `0.995098`.
-- The mean validation F1-score across folds was `0.992905`.
+### Discriminator
 
-### ViT Training Summary
+* Input: Image + class label embedding (reshaped to spatial map)
+* Architecture: Convolutional layers with progressive downsampling
+* Activations: LeakyReLU
+* Output: Real/Fake probability (binary classification)
 
-| Metric | Value |
-| --- | ---: |
-| Backbone | `google/vit-base-patch16-224` |
-| Best epoch | 4 |
-| Validation loss | 0.293962 |
-| Validation accuracy | 1.000000 |
-| Validation precision | 1.000000 |
-| Validation recall | 1.000000 |
-| Validation F1-score | 1.000000 |
-| Training time | 10.392 min |
+The label embedding is spatially expanded and concatenated with the image channels to enforce conditional discrimination.
 
-ViT epoch history from the notebook:
+### Training Configuration
 
-| Epoch | Training accuracy | Validation accuracy |
-| --- | ---: | ---: |
-| 1 | 0.6986 | 0.8365 |
-| 2 | 0.8622 | 0.8822 |
-| 3 | 0.9862 | 0.9928 |
-| 4 | 0.9917 | 1.0000 |
-| 5 | 0.9914 | 0.9976 |
+* Loss: Binary Cross Entropy with Logits
+* Optimizer: Adam
+* Learning rate: 0.0002
+* Beta1: 0.5
+* Batch size: 64
+* Epochs: 50
+* Image size: 64 × 64
+* Training split: Training dataset only
 
-The ViT result is very strong on the validation split, but the final test result reported by the notebook is based on the ResNet50 3-fold ensemble, not the ViT alone.
+### Training Strategy
 
-### ViT CV Results
-| Fold     | Final Train Accuracy | Best Validation Accuracy |
-| -------- | -------------------- | ------------------------ |
-| 1        | 0.9763               | 0.9730                   |
-| 2        | 0.9771               | 0.9664                   |
-| 3        | 0.9783               | 0.9787                   |
-| **Mean** | **0.9772**           | **0.9665**               |
+* Alternate updates between discriminator and generator
+* Real images labeled as 1, generated images as 0
+* Generator trained to fool discriminator into predicting generated images as real
+* Class labels randomly sampled for fake image generation
+
+---
+
+### Generated Samples
+
+The trained GAN generates synthetic potato leaf images for each class. Below are representative samples produced by the generator.
+
+### Early Blight (Synthetic)
+<img width="256" height="256" alt="PLD_3_Classes_256__Testing__Early_Blight__Early_Blight_145__gaussian_noise_3" src="https://github.com/user-attachments/assets/df7bdc37-6a72-41ad-80e9-caacda81cae4" />
+<img width="256" height="256" alt="PLD_3_Classes_256__Training__Early_Blight__Early_Blight_1058__gaussian_noise_2" src="https://github.com/user-attachments/assets/b59b7c02-24ff-4d7c-a7c8-4135e02efadf" />
+<img width="256" height="256" alt="PLD_3_Classes_256__Training__Early_Blight__Early_Blight_859__gaussian_noise_1" src="https://github.com/user-attachments/assets/852bd3c6-8a29-4239-83e8-783154d1a69b" />
 
 
+The generated Early Blight samples show characteristic lesion-like patterns and texture variations, indicating that the model has learned disease-specific visual cues.
 
-### Comparative Validation Study
+---
 
-The comparative study uses validation metrics, not the final test set. ViT is reused from the dedicated ViT run, while ResNet50 and VGG16 are trained in the comparison block.
+### Healthy Leaves (Synthetic)
+<img width="256" height="256" alt="PLD_3_Classes_256__Testing__Healthy__Healthy_12__gaussian_noise_3" src="https://github.com/user-attachments/assets/10a8bd8f-6c43-46f7-9f68-b8b2c68121c8" />
+<img width="256" height="256" alt="PLD_3_Classes_256__Training__Healthy__Healthy_447__gaussian_noise_1" src="https://github.com/user-attachments/assets/ae7a2ada-8bd0-4fbe-b8f9-63037932fc47" />
+<img width="256" height="256" alt="PLD_3_Classes_256__Training__Healthy__Healthy_806__gaussian_noise_2" src="https://github.com/user-attachments/assets/f2d39ac2-0381-4026-bb2c-6198dbe0dd40" />
 
-| Model | Best epoch | Validation loss | Validation accuracy | Validation precision | Validation recall | Validation F1 | Training time |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| ViT | 4 | 0.293962 | 1.000000 | 1.000000 | 1.000000 | 1.000000 | 10.392 min |
-| ResNet50 | 4 | 0.229220 | 0.980769 | 0.981390 | 0.980769 | 0.980749 | 6.421 min |
-| VGG16 | 3 | 0.208052 | 0.992788 | 0.992835 | 0.992788 | 0.992780 | 10.575 min |
 
-Comparative interpretation:
-- ViT achieved the best validation score in this comparison block with perfect validation precision, recall, and F1-score.
-- VGG16 was the strongest CNN in the short comparison run, reaching `0.992780` validation F1.
-- ResNet50 comparison training was shorter than the dedicated 3-fold pipeline, so its comparison score should not be read as the final ResNet50 result.
-- The final test model remains the ResNet50 3-fold ensemble because the notebook explicitly evaluates the ensemble on the untouched test set.
+Healthy class samples exhibit smooth texture and uniform coloration, closely resembling real healthy leaves without disease artifacts.
 
-### Final Test Evaluation
+---
 
-Final model: `resnet50_3fold_ensemble`
+### Late Blight (Synthetic)
+<img width="256" height="256" alt="PLD_3_Classes_256__Training__Late_Blight__Late_Blight_149__gaussian_noise_3" src="https://github.com/user-attachments/assets/827b1597-5618-4e1f-8941-2c0e316e0f3d" />
+<img width="256" height="256" alt="PLD_3_Classes_256__Training__Late_Blight__Late_Blight_19__gaussian_noise_1" src="https://github.com/user-attachments/assets/6de7b77e-44c2-41d9-a2a6-4095b1e94ae7" />
+<img width="256" height="256" alt="PLD_3_Classes_256__Training__Late_Blight__Late_Blight_231__gaussian_noise_2" src="https://github.com/user-attachments/assets/2c0145b5-c208-4fb8-9bd3-50011eac4f35" />
 
-| Metric | Value |
-| --- | ---: |
-| Test loss | 0.0759 |
-| Test accuracy | 0.9901 |
-| Test precision | 0.9904 |
-| Test recall | 0.9901 |
-| Test F1-score | 0.9901 |
-| Test images | 405 |
+Late Blight samples capture irregular dark regions and spread patterns, demonstrating that the GAN can approximate complex disease structures.
 
-Per-class metrics:
+---
 
-| Class | Precision | Recall | F1-score |
-| --- | ---: | ---: | ---: |
-| Early_Blight | 1.00 | 0.98 | 0.99 |
-| Healthy | 0.97 | 1.00 | 0.99 |
-| Late_Blight | 0.99 | 1.00 | 1.00 |
-| Macro average | 0.99 | 0.99 | 0.99 |
-| Weighted average | 0.99 | 0.99 | 0.99 |
+## Observations
 
-Confusion matrix:
+* The conditional setup ensures **class-consistent image generation**
+* Generated images retain **semantic features of each disease class**
+* Visual diversity improves across epochs due to adversarial training
+* Some artifacts remain due to **low resolution (64×64)** and limited training stability
 
-![Final Test Confusion Matrix](newplots/confusion_matrix_test.png)
+---
 
-| Actual \ Predicted | Early_Blight | Healthy | Late_Blight |
-| --- | ---: | ---: | ---: |
-| Early_Blight | 158 | 3 | 1 |
-| Healthy | 0 | 102 | 0 |
-| Late_Blight | 0 | 0 | 141 |
+# Results
 
-The confusion matrix shows only 4 errors out of 405 test images. All 4 errors come from the `Early_Blight` class: 3 images are predicted as `Healthy`, and 1 image is predicted as `Late_Blight`. The model correctly classifies every `Healthy` and `Late_Blight` test image.
+## ResNet50 3-Fold Cross-Validation
 
-### ROC-AUC
+| Fold | Validation Accuracy | Validation F1 |
+| ---- | ------------------- | ------------- |
+| 1    | 0.8910              | 0.8910        |
+| 2    | 0.8926              | 0.8926        |
+| 3    | 0.8951              | 0.8951        |
+| Mean | 0.8929              | 0.8929        |
 
-![ROC Curves](newplots/roc_curves.png)
+The model shows consistent high performance across all folds, indicating strong generalization and minimal overfitting.
 
-| Class | ROC-AUC |
-| --- | ---: |
-| Early_Blight | 1.000 |
-| Healthy | 1.000 |
-| Late_Blight | 1.000 |
+### ViT 3-Fold Cross-Validation
 
-The ROC curves report perfect one-vs-rest AUC values for all three classes. This means the ensemble's probability scores separate each class very strongly, even though the final thresholded predictions still contain 4 classification errors.
+| Fold | Validation Accuracy |
+| ---- | ------------------- |
+| 1    | 0.8730              |
+| 2    | 0.8664              |
+| 3    | 0.8787              |
+| Mean | 0.8665              |
+
+## Robustness Results
+
+| Perturbation      | Severity | Accuracy |
+| ----------------- | -------- | -------- |
+| Gaussian Noise    | 0.10     | 0.50     |
+| Salt & Pepper     | 0.06     | 0.43     |
+| Gaussian Blur     | 4        | 0.67     |
+| Brightness Change | 1.80     | 0.83     |
+| Contrast Change   | 1.80     | 0.76     |
+
+The model is most robust to brightness and contrast changes, moderately sensitive to blur, and highly sensitive to noise.
+
+---
 
 ### Explainability Results
 
@@ -461,72 +225,21 @@ The notebook evaluates robustness on a small balanced test subset of 30 images: 
 
 | Perturbation | Severity | Accuracy | F1-score |
 | --- | ---: | ---: | ---: |
-| Gaussian noise | 0.03 | 0.9333 | 0.9346 |
+| Gaussian noise | 0.03 | 0.8333 | 0.8346 |
 | Gaussian noise | 0.06 | 0.8000 | 0.8027 |
 | Gaussian noise | 0.10 | 0.5000 | 0.4554 |
 | Salt and pepper | 0.01 | 0.8333 | 0.8359 |
 | Salt and pepper | 0.03 | 0.7667 | 0.7738 |
 | Salt and pepper | 0.06 | 0.4333 | 0.3749 |
-| Gaussian blur | 1 | 0.9000 | 0.9019 |
+| Gaussian blur | 1 | 0.8500 | 0.8019 |
 | Gaussian blur | 2 | 0.8333 | 0.8375 |
 | Gaussian blur | 4 | 0.6667 | 0.6506 |
-| Brightness | 0.60 | 1.0000 | 1.0000 |
-| Brightness | 1.40 | 0.9667 | 0.9666 |
-| Brightness | 1.80 | 0.9333 | 0.9332 |
-| Contrast | 0.60 | 0.9333 | 0.9333 |
-| Contrast | 1.40 | 0.9333 | 0.9332 |
-| Contrast | 1.80 | 0.8667 | 0.8644 |
-
-Robustness interpretation:
-- The model is most stable under brightness changes, staying between `0.9333` and `1.0000` accuracy.
-- Contrast changes also remain strong, with accuracy from `0.8667` to `0.9333`.
-- Gaussian blur causes a gradual decline as blur increases, dropping from `0.9000` to `0.6667`.
-- Gaussian noise is more damaging at high severity, dropping to `0.5000` accuracy at severity `0.10`.
-- Salt-and-pepper noise is the most harmful perturbation in this run, dropping to `0.4333` accuracy and `0.3749` F1-score at severity `0.06`.
-
-### Result Artifacts
-
-The README result figures are taken only from `newplots/`:
-- `newplots/training_history.png`
-- `newplots/confusion_matrix_test.png`
-- `newplots/roc_curves.png`
-- `newplots/gradcam_resnet50_summary.png`
-- `newplots/vit_attention_summary.png`
-- `newplots/robustness_results.png`
-- `newplots/robustness_heatmap.png`
-
-## GitHub Guidance
-
-When pushing to GitHub, keep these rules in mind:
-- Do not commit `venv/`
-- Do not commit the raw dataset if the repository should stay lightweight
-- Keep `data/ViT_XAI_Potato_Assignment-G2.pdf` if you want the assignment document tracked in the repo
-- Generated files are already grouped under `outputs/`
-- Large trained weight files are stored locally in `models/` in this checkout; if you want them versioned on GitHub, use Git LFS or another artifact store because GitHub rejects files larger than 100 MB.
-
-## Troubleshooting
-
-### Checkpoint not found
-Make sure you have already trained the model so the checkpoint exists under `outputs/checkpoints/`.
-
-### Dataset not found
-Place the PlantVillage dataset in one of these locations:
-- `data/PlantVillage/`
-- `PlantVillage/` at the repository root
-
-### CUDA not available
-Verify that your local PyTorch installation is the CUDA-enabled build and that the NVIDIA driver is installed correctly.
-
-### Script path issues
-Run commands from the repository root, not from inside `scripts/`.
-
-## Deliverables
-
-- Source code in `scripts/`
-- Dataset in `data/`
-- Grouped outputs in `outputs/`
-- Installation instructions in this README
-- Dependency list in `requirements.txt`
+| Brightness | 0.60 | 0.8700 | 0.8500 |
+| Brightness | 1.40 | 0.8667 | 0.8666 |
+| Brightness | 1.80 | 0.8333 | 0.9332 |
+| Contrast | 0.60 | 0.8333 | 0.8333 |
+| Contrast | 1.40 | 0.8333 | 0.8332 |
+| Contrast | 1.80 | 0.8667 | 0.8244 |
 
 ## Group Members
 
@@ -535,7 +248,3 @@ Run commands from the repository root, not from inside `scripts/`.
 - TANISHQ PARIHAR (BT23CSD005)
 - MITHRA (BT23CSD025)
 - UTKARSH GAUR (BT23CSD055)
-
-## License
-
-Educational project for computer vision and deep learning coursework.
