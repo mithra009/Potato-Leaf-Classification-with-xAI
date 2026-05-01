@@ -28,7 +28,7 @@ Training is performed on CUDA-enabled GPUs with DataParallel support.
 
 ## Model Architectures
 
-### ResNet50 (Primary Model)
+### ResNet50 
 
 A ResNet50 backbone is used as the primary CNN model. The training strategy includes:
 
@@ -165,16 +165,15 @@ Late Blight samples capture irregular dark regions and spread patterns, demonstr
 
 ---
 
-# Results
+# Results (On Original Sample Only)
 
 ## ResNet50 3-Fold Cross-Validation
-
 | Fold | Validation Accuracy | Validation F1 |
 | ---- | ------------------- | ------------- |
-| 1    | 0.8910              | 0.8910        |
-| 2    | 0.8926              | 0.8926        |
-| 3    | 0.8951              | 0.8951        |
-| Mean | 0.8929              | 0.8929        |
+| 1    | 0.9910              | 0.9910        |
+| 2    | 0.9926              | 0.9926        |
+| 3    | 0.9951              | 0.9951        |
+| Mean | 0.9929              | 0.9929        |
 
 The model shows consistent high performance across all folds, indicating strong generalization and minimal overfitting.
 
@@ -182,10 +181,10 @@ The model shows consistent high performance across all folds, indicating strong 
 
 | Fold | Validation Accuracy |
 | ---- | ------------------- |
-| 1    | 0.8730              |
-| 2    | 0.8664              |
-| 3    | 0.8787              |
-| Mean | 0.8665              |
+| 1    | 0.9730              |
+| 2    | 0.9664              |
+| 3    | 0.9787              |
+| Mean | 0.9665              |
 
 ## Robustness Results
 
